@@ -1,0 +1,11 @@
+# Copyright (c) 2016-2020 Andreas Goulas
+# Licensed under the MIT license.
+
+env = Environment(
+  CPPPATH=['../include'],
+  CXXFLAGS='-O3 -Wall')
+
+env.Program('test_ga', source='test_ga.cc')
+env.Program('test_ga_nqueen', source='test_ga_nqueen.cc')
+env.Program('test_island_model', source='test_island_model.cc')
+env.Program('test_pbil', source='test_pbil.cc')
