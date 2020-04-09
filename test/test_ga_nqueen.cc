@@ -68,7 +68,7 @@ int main() {
     0.2, 0.8, f,
     snf::SelectionSus(snf::SelectionSize(0.4)),
     snf::CrossoverPmx(),
-    snf::MutationSwap(),
+    snf::MutationSwap(1),
     snf::ReplacementElitist(snf::SelectionSize(0.6)),
     snf::TerminationFitness<double>(kSize));
 

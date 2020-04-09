@@ -37,14 +37,24 @@ struct MutationBitFlip {
 
 /// Swap mutation.
 ///
-/// Two positions are selected at random and the values are interchanged.
+/// The elements of the individual are interchanged uniformly at random.
 struct MutationSwap {
+  explicit MutationSwap(int count) : count(count) {}
+
+  /// Number of swaps.
+  int count;
+
   template <typename T, typename Rng>
   void operator()(T& value, Rng& rng) {
     std::uniform_int_distribution<size_t> dist(0, value.size() - 1);
-    size_t index0 = dist(rng);
-    size_t index1 = dist(rng);
-    std::swap(value[index0], value[index1]);
+    for (int i = 0; i < count; ++i) {
+      size_t index0 = dist(rng);
+      size_t index1;
+      do {
+        index1 = dist(rng);
+      } while (index0 == index1);
+      std::swap(value[index0], value[index1]);
+    }
   }
 };
 
