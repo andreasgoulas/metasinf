@@ -71,6 +71,29 @@ struct MutationInvert {
   }
 };
 
+/// Move mutation.
+///
+/// An element of the individual is moved to a random position.
+struct MutationMove {
+  template <typename T, typename Rng>
+  void operator()(T& value, Rng& rng) {
+    std::uniform_int_distribution<size_t> dist(0, value.size() - 1);
+    size_t index0 = dist(rng);
+    size_t index1;
+    do {
+      index1 = dist(rng);
+    } while (index0 == index1);
+
+    size_t min_index = std::min(index0, index1);
+    size_t max_index = std::max(index0, index1);
+    typename T::value_type tmp = value[max_index];
+    for (size_t i = max_index; i > min_index; --i) {
+      value[i] = value[i - 1];
+    }
+    value[min_index] = tmp;
+  }
+};
+
 /// Boundary mutation.
 ///
 /// The value of the individual is randomly replaced by its lower or upper
