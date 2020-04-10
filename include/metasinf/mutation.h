@@ -42,6 +42,7 @@ struct MutationSwap {
 
   template <typename T, typename Rng>
   void operator()(T& value, Rng& rng) {
+    assert(value.size() > 1);
     std::uniform_int_distribution<size_t> dist(0, value.size() - 1);
     for (int i = 0; i < count; ++i) {
       size_t index0 = dist(rng);
@@ -60,14 +61,19 @@ struct MutationSwap {
 struct MutationInvert {
   template <typename T, typename Rng>
   void operator()(T& value, Rng& rng) {
-    std::uniform_int_distribution<size_t> dist(0, value.size() - 1);
+    assert(value.size() > 1);
+    std::uniform_int_distribution<size_t> dist(0, value.size());
     size_t index0 = dist(rng);
     size_t index1;
     do {
       index1 = dist(rng);
     } while (index0 == index1);
-    std::reverse(value.begin() + std::min(index0, index1),
-                 value.begin() + std::max(index0, index1));
+
+    if (index0 > index1) {
+      std::swap(index0, index1);
+    }
+
+    std::reverse(value.begin() + index0, value.begin() + index1);
   }
 };
 
@@ -77,6 +83,7 @@ struct MutationInvert {
 struct MutationMove {
   template <typename T, typename Rng>
   void operator()(T& value, Rng& rng) {
+    assert(value.size() > 1);
     std::uniform_int_distribution<size_t> dist(0, value.size() - 1);
     size_t index0 = dist(rng);
     size_t index1;
@@ -84,13 +91,15 @@ struct MutationMove {
       index1 = dist(rng);
     } while (index0 == index1);
 
-    size_t min_index = std::min(index0, index1);
-    size_t max_index = std::max(index0, index1);
-    typename T::value_type tmp = value[max_index];
-    for (size_t i = max_index; i > min_index; --i) {
+    if (index0 > index1) {
+      std::swap(index0, index1);
+    }
+
+    auto tmp = value[index1];
+    for (size_t i = index1; i > index0; --i) {
       value[i] = value[i - 1];
     }
-    value[min_index] = tmp;
+    value[index0] = tmp;
   }
 };
 
