@@ -74,6 +74,10 @@ struct SelectionRouletteWheel {
   void operator()(Population<T, F>& src, Population<T, F>& dst, Rng& rng) {
     thread_local std::vector<F> cum_fitness;
 
+    if (src.empty()) {
+      return;
+    }
+
     cum_fitness.resize(src.size());
     cum_fitness[0] = src[0].fitness;
     for (size_t i = 1; i < src.size(); ++i) {
