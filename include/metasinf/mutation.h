@@ -54,6 +54,23 @@ struct MutationSwap {
   }
 };
 
+/// Inversion mutation.
+///
+/// A segment of the individual is reversed uniformly at random.
+struct MutationInvert {
+  template <typename T, typename Rng>
+  void operator()(T& value, Rng& rng) {
+    std::uniform_int_distribution<size_t> dist(0, value.size() - 1);
+    size_t index0 = dist(rng);
+    size_t index1;
+    do {
+      index1 = dist(rng);
+    } while (index0 == index1);
+    std::reverse(value.begin() + std::min(index0, index1),
+                 value.begin() + std::max(index0, index1));
+  }
+};
+
 /// Boundary mutation.
 ///
 /// The value of the individual is randomly replaced by its lower or upper
