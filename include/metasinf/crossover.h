@@ -10,60 +10,12 @@
 
 namespace snf {
 
-/// Bitfield crossover.
-///
-/// A number of crossover points are chosen at random. The bits between
-/// successive points are exchanged between the two parents.
-struct CrossoverBit {
-  explicit CrossoverBit(int point_count = 1)
-      : point_count(point_count) {}
-
-  /// Number of crossover points.
-  int point_count;
-
-  template <typename T, typename Rng>
-  void operator()(T& value0, T& value1, Rng& rng) {
-    size_t size = sizeof(T) * CHAR_BIT;
-    std::uniform_int_distribution<size_t> dist(0, size - 1);
-    for (int i = 0; i < point_count; ++i) {
-      size_t index = dist(rng);
-      T mask = (1 << index) - 1;
-
-      T tmp = value0;
-      value0 = (~mask & value0) | (mask & value1);
-      value1 = (~mask & value1) | (mask & tmp);
-    }
-  }
-};
-
-/// Uniform bitfield crossover.
-///
-/// The uniform crossover evaluates each bit in the parents for exchange with a
-/// probability of 0.5.
-struct CrossoverUniformBit {
-  template <typename T, typename Rng>
-  void operator()(T& value0, T& value1, Rng& rng) {
-    size_t size = sizeof(T) * CHAR_BIT;
-    std::bernoulli_distribution dist;
-    T mask = 1;
-    for (size_t i = 0; i < size; ++i) {
-      if (dist(rng)) {
-        T tmp = value0;
-        value0 = (~mask & value0) | (mask & value1);
-        value1 = (~mask & value1) | (mask & tmp);
-      }
-
-      mask <<= 1;
-    }
-  }
-};
-
-/// Vector crossover.
+/// N-point crossover.
 ///
 /// A number of crossover points are chosen at random. The elements between
 /// successive points are exchanged between the two parents.
-struct CrossoverVector {
-  explicit CrossoverVector(int point_count = 1)
+struct CrossoverPoint {
+  explicit CrossoverPoint(int point_count = 1)
       : point_count(point_count) {}
 
   /// Number of crossover points.
@@ -80,11 +32,11 @@ struct CrossoverVector {
   }
 };
 
-/// Uniform vector crossover.
+/// Uniform crossover.
 ///
 /// The uniform crossover evaluates each element in the parents for exchange
 /// with a probability of 0.5.
-struct CrossoverUniformVector {
+struct CrossoverUniform {
   template <typename T, typename Rng>
   void operator()(T& value0, T& value1, Rng& rng) {
     size_t size = std::min(value0.size(), value1.size());

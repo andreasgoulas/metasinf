@@ -14,23 +14,19 @@ namespace snf {
 /// Binary mutation.
 ///
 /// The bits of the individual are flipped uniformly at random.
-struct MutationBitFlip {
-  explicit MutationBitFlip(double prob) : prob(prob) {}
+struct MutationFlip {
+  explicit MutationFlip(double prob) : prob(prob) {}
 
   /// Mutation probability.
   double prob;
 
   template <typename T, typename Rng>
   void operator()(T& value, Rng& rng) {
-    size_t size = sizeof(T) * CHAR_BIT;
     std::bernoulli_distribution dist(prob);
-    T mask = 1;
-    for (size_t i = 0; i < size; ++i) {
+    for (size_t i = 0; i < value.size(); ++i) {
       if (dist(rng)) {
-        value ^= mask;
+        value[i] = !value[i];
       }
-
-      mask <<= 1;
     }
   }
 };
